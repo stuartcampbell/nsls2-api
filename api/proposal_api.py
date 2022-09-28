@@ -77,7 +77,6 @@ async def get_commissioning_proposals(return_json: bool = True):
 
 @router.get('/proposals/{cycle}')
 async def get_proposals_for_cycle(cycle: str):
-#    async def get_proposals_for_cycle(cycle: str, include_commissioning=False):
     database = client["nsls2core"]
     collection = database["cycles"]
     query = {"name": str(cycle)}
@@ -86,36 +85,6 @@ async def get_proposals_for_cycle(cycle: str):
     result = []
     for doc in cursor:
         result.append(doc)
-
-    # if include_commissioning:
-    #     pipeline = [
-    #         {
-    #             "$match": {
-    #                 "pass_type_id": "300005"
-    #             }
-    #         },
-    #         {
-    #             "$project": {
-    #                 "proposal_id": 1.0
-    #             }
-    #         },
-    #         {
-    #             "$group": {
-    #                 "_id": None,
-    #                 "proposal_id": {
-    #                     "$addToSet": "$proposal_id"
-    #                 }
-    #             }
-    #         }
-    #     ]
-    #     proposals_collection = database['proposals']
-    #     cursor = proposals_collection.aggregate(
-    #         pipeline,
-    #         allowDiskUse=False
-    #     )
-    #     for doc in cursor:
-    #         result['proposals'].extend(doc['proposal_id'])
-
     return result
 
 @router.get('/proposal/{proposal_id}/usernames')
@@ -204,7 +173,7 @@ async def get_proposal_directories(proposal_id: ProposalIn = Depends(), testing:
 
     # Ensure we set a sensible default incase there are no cycles listed for the proposal.
     proposal_doc.setdefault('cycles', [])
-
+    
     data_session = proposal_doc['data_session']
     beamlines = proposal_doc['instruments']
     cycles = proposal_doc['cycles']
