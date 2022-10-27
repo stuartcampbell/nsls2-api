@@ -15,7 +15,7 @@ async def fetch_all_beamlines():
     instruments = []
     cursor = db.beamlines.find({}, {'_id': 0})
     for doc in cursor:
-        pprint.pprint(doc)
+        # pprint.pprint(doc)
         instruments.append(Instrument(**doc))
     return instruments
 
