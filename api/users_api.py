@@ -1,4 +1,5 @@
 import json
+import pprint
 
 import fastapi
 import re
@@ -7,6 +8,7 @@ import ldap3.utils.dn
 from fastapi import Depends, Header
 from pymongo import MongoClient
 
+from api.instrument_api import get_instruments
 from models.users import User, DataAdmins, DataSessionAccess
 from services import bnlpeople_service
 from services import n2sn_service
@@ -175,12 +177,15 @@ async def get_user_dataadmin_rights(username: str):
     beamline_dataadmin = []
 
     # TODO: this is not the place to do it... but for now
-    f = open("beamlines.yml")
-    beamlines = json.load(f)
+    # f = open("beamlines.yml")
+    # beamlines = json.load(f)
+    beamlines = await get_instruments()
     for beamline in beamlines:
-        tla = str(beamline['name']).lower()
+        pprint.pprint(beamline)
+        # tla = str(beamline['name']).lower()
+        tla = beamline.name
         datagroup_name = f"n2sn-right-dataadmin-{tla}"
-        if n2sn_service.is_user_in_group(username, datagroup_name):
+        if await n2sn_service.is_user_in_group(username, datagroup_name):
             beamline_dataadmin.append(tla)
 
     response['dataadmin'] = beamline_dataadmin
